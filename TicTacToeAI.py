@@ -105,10 +105,12 @@ class AI:
     recursively creating every possible move. See README.txt for more details.
     '''
     def minimax(self, board, player, enemy, depth=0):
+        '''if move set reaches an endgame state, return corresponding score'''
         score = self.complete(board, depth)
         if score != None:
             return score
-        if score == None:
+        elif score == None:
+            '''otherwise get available moves'''
             options = self.getOptions(board)
             if options == None:
                 return 0
@@ -117,11 +119,24 @@ class AI:
             for i in options:
                 newBoard = list(board)
                 newBoard[i] = player
+                '''Recursively call minimax to get a score for every move, but 
+                switch which marker is player and enemy to optimize for next
+                level of depth. If move does not lead to an endgame state,
+                minimax will continue going deeper until an endgame is reached.
+                '''
                 value = self.minimax(newBoard, enemy, player, depth)
+                '''append value directly if score returned, or append score from
+                lower level's optimization. 
+                '''
                 if type(value) is int:
                     scoreList.append((value, i))
                 else:
                     scoreList.append((value[0], i))
+            '''maximize or minimize score depending on which player would move
+            on corresponding level of depth. Return score and depth as tuple so
+            both score and move are retained. This allows for higher depths to
+            just use the score and for the final result to get the board space.
+            '''
             if player == self.marker:
                 m = max(scoreList)
                 return m
